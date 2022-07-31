@@ -283,6 +283,7 @@ public class NetworkModule {
     }
     IItemStackMatcher usedMatcher = matcher;
     int alreadyTransferred = 0;
+    // Reverse link priorities to pull out of the non-ideal links first. This allows inventories to self-correct if items end up in a less than ideal chest according to link priority.
     for (IConnectableLink storage : getReverseSortedConnectableStorage()) {
       int req = size - alreadyTransferred;
       ItemStack simExtract = storage.extractStack(usedMatcher, req, simulate);
