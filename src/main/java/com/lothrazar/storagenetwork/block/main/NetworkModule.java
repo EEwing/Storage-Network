@@ -103,13 +103,13 @@ public class NetworkModule {
 
   /**
    * get sorted list of network contents. used by screen containers.
-   * 
+   *
    * Nodes are sorted by priority, as well as relying on the capability, see IConenctableLink::getStoredStacks
-   * 
+   *
    * respects local node filter settings
-   * 
+   *
    * use getStacks() instead if no sort is needed
-   * 
+   *
    * @return
    */
   public List<ItemStack> getSortedStacks() {
@@ -283,7 +283,7 @@ public class NetworkModule {
     }
     IItemStackMatcher usedMatcher = matcher;
     int alreadyTransferred = 0;
-    for (IConnectableLink storage : getSortedConnectableStorage()) {
+    for (IConnectableLink storage : getReverseSortedConnectableStorage()) {
       int req = size - alreadyTransferred;
       ItemStack simExtract = storage.extractStack(usedMatcher, req, simulate);
       if (simExtract.isEmpty()) {
@@ -395,6 +395,21 @@ public class NetworkModule {
     }
     catch (Exception e) {
       //trying to avoid 
+      //java.lang.StackOverflowError: Ticking block entity
+      //and similar issues
+      StorageNetworkMod.LOGGER.error("Error: network get sorted by priority error, some network components are disconnected ", e);
+      return new ArrayList<>();
+    }
+  }
+  private List<IConnectableLink> getReverseSortedConnectableStorage() {
+    try {
+      Set<IConnectableLink> storage = getConnectableStorage();
+      Stream<IConnectableLink> stream = storage.stream();
+      List<IConnectableLink> sorted = stream.sorted(Comparator.comparingInt(IConnectableLink::getPriority).reversed()).collect(Collectors.toList());
+      return sorted;
+    }
+    catch (Exception e) {
+      //trying to avoid
       //java.lang.StackOverflowError: Ticking block entity
       //and similar issues
       StorageNetworkMod.LOGGER.error("Error: network get sorted by priority error, some network components are disconnected ", e);

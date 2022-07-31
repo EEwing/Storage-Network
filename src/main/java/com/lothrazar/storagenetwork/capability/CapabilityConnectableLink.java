@@ -145,7 +145,8 @@ public class CapabilityConnectableLink implements IConnectableLink, INBTSerializ
     //    }
     ItemStack firstMatchedStack = ItemStack.EMPTY;
     int remaining = size;
-    for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
+    // loop backward to extract in the reverse order that items were added.
+    for (int slot = itemHandler.getSlots()-1; slot >= 0; slot--) {
       //force simulate: allow them to not let me see the stack, also dont extract since it might steal/dupe
       ItemStack stack = itemHandler.extractItem(slot, remaining, true);
       if (stack == null || stack.isEmpty()) {
